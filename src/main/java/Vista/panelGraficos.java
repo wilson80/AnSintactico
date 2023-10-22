@@ -178,11 +178,8 @@ public class panelGraficos extends javax.swing.JPanel {
 //            default:
 //                throw new AssertionError();
         }
-        
-        
         contenedorDeContenedorTokens.updateUI();
 //        this.repaint();
-        
     }//GEN-LAST:event_botonClasificarActionPerformed
 
     public JPanel getContenedorDeContenedorTokens() {

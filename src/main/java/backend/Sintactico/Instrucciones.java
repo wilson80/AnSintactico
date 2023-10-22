@@ -9,8 +9,6 @@ import Tokens.Token;
  */
 public class Instrucciones {
     
-    
-    
     private String id;              //contiene la instruccion
     private Token token;
     private boolean constanteNumerica;
@@ -24,16 +22,19 @@ public class Instrucciones {
     private int linea;
     private int columna;
     
-
+//      uno = 2
+    
     public Instrucciones(Token token, String id, boolean numerica, boolean cadenaCaracteres) {
         this.token = token;
         this.id = id;
         this.constanteNumerica = numerica;
         this.constanteCaracteres = cadenaCaracteres;
-        if(this.token!=null){
+        
+        if(token!=null){
             setExpresion();
         }
     }
+    
     
     public void setExpresion(){
         simbolo = id;
@@ -55,12 +56,29 @@ public class Instrucciones {
         linea = token.getLinea();
         columna = token.getColumna();
         
+        if(token.getLexema().equals("def")){
+            if(constanteNumerica){
+                valor = "Entero"; 
+                tipo = "funct";
+            }
+
+            if(constanteCaracteres){
+                valor = "cadena";
+                tipo = "funct";
+            }
+            if(!constanteNumerica && !constanteCaracteres){
+                valor ="Boolean";
+                tipo = "funct";
+            }
+
+//            linea = token.getLinea();
+//            columna = token.getColumna();
+
+            
+        }
+        
     }
     
-    
-//        se necesita la linea inicial del Token
-    public void calcularLinea(){}
-
     public void setToken(Token token) {
         this.token = token;
     }
@@ -84,6 +102,12 @@ public class Instrucciones {
     public int getColumna() {
         return columna;
     }
+
+    public String getId() {
+        return id;
+    }
+    
+ 
     
     
 }

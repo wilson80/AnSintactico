@@ -61,14 +61,14 @@ public class ControlAnalizadorLexico {
             
              if(tokenNumericoAgregado || errorHallado){
                  dentroDeEnteros = false;
-                 tokenNumericoAgregado = false;
+                 tokenNumericoAgregado = false;  //      "uno" dos"
              }   
              
-            if(!dentroDeCadena){
+            if(!dentroDeCadena){                //no se esta reconociendo una cadena 
                 verificarComentario(valor);
             }
-            if(!dentroDeComentario){
-                    buscarCadena(valor);
+            if(!dentroDeComentario){            //no se esta reconociendo un comentario
+                    buscarCadena(valor);    
             }
             
             if(dentroDeComentario==false && dentroDeCadena==false){      //Si esta reconociendo un comentario no entra en el switch                
@@ -89,7 +89,7 @@ public class ControlAnalizadorLexico {
 //            System.out.println("Bufer: " +buffer);
         }
             System.out.println("Tokens Encontrados");
-            imprimirTokens();
+//            imprimirTokens();
             
         
 
@@ -175,6 +175,8 @@ public class ControlAnalizadorLexico {
     public void buscarCadena(char valor){
         if(!dentroDeCadena){
                 if(valor=='"'){
+                    comparar(buffer, linea, columna);      // cuando pase esto>>>>    " uno" dos"
+                    buffer = "";
                     columna++;      //pendiente
                 dentroDeCadena = true;
                 cadenaAperturai=iterador;
@@ -183,23 +185,37 @@ public class ControlAnalizadorLexico {
         }
     }
     
-    public void reconocerCadena(char valor){
+    public void reconocerCadena(char valor) {
         
-        if(cadenaAperturai!=iterador){
-            if(dentroDeCadena == true){ 
+        
+        if(cadenaAperturai!=iterador) {
+            if(dentroDeCadena == true) {         //Verificacion  cuando hay salto de linea y no reconoce la cadena de cierre
                 buffer+=valor;
                 columna++;  //pendiente
-                if(valor=='"'  || iterador==caracteresIngresados.length-1){
-                    if(valor == '"'){           // verificando las " comillas de cierre de la cadena
+                
+                    if(valor == '\n'){
+                            char [] tamañoT = buffer.toCharArray();
+                            int tamañoToken = tamañoT.length-1;     //Ajustes de linea
+                            columna = columna-tamañoToken;
+                            Token token = new Token(buffer, TokenEnum.ERROR, linea, columna);
+                            listTokens.add(token);
+                            columna += tamañoToken;      //pendiente
+                            
+                            buffer="";
+                            columna = 0;
+                        dentroDeCadena = false;
+                            linea++;
+                    }
+                    if(valor == '"' ) {           // verificando las " comillas de cierre de la cadena
                         char [] tamañoT = buffer.toCharArray();
-                        int tamañoToken = tamañoT.length-1;     //pendiente
+                        int tamañoToken = tamañoT.length-1;     //Ajustes de linea
                         columna = columna-tamañoToken;
-                    Token token = new Token(buffer, TokenEnum.CADENA_DE_CARACTERES, linea, columna);
-                    listTokens.add(token);
-                    columna +=tamañoToken;      //pendiente
-                    buffer="";
-//                    columna++;
-                    dentroDeCadena = false;
+                        Token token = new Token(buffer, TokenEnum.CADENA_DE_CARACTERES, linea, columna);
+                        listTokens.add(token);
+                        columna +=tamañoToken;      //pendiente
+                        buffer="";
+    //                    columna++;
+                        dentroDeCadena = false;
                     }else {
                         if(iterador==caracteresIngresados.length-1){ //si llega al ultimo caracter ingresado 
                                                                     //  y no recnonoce unas " comillas de cierre entonces califica como error
@@ -211,8 +227,8 @@ public class ControlAnalizadorLexico {
                             buffer="";
                         }
                     }
-                }
-            }
+                
+            }       //finIf Dentro Cadena
         }
     }
     
@@ -487,7 +503,7 @@ public class ControlAnalizadorLexico {
                         
                     } catch (Exception e) {
                             columna++;
-                        Token token = new Token("!", TokenEnum.ERROR, linea, columna);
+                         Token token = new Token("!", TokenEnum.ERROR, linea, columna);
                         listTokens.add(token);
                         System.out.println("Fin de cadena de Caracteres No hay Siguiente");
                     }
@@ -596,7 +612,7 @@ public class ControlAnalizadorLexico {
         columna += tamañoToken;
     }
       
-    public void imprimirTokens(){
+    private void imprimirTokens(){
         for (int i = 0; i < listTokens.size(); i++) {
             System.out.println("\t\t\t\t\t: " + i);
             System.out.println(listTokens.get(i).toString());

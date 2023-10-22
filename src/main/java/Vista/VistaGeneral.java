@@ -13,6 +13,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
@@ -51,7 +52,9 @@ public class VistaGeneral extends javax.swing.JFrame {
         cajonEditorTexto = new javax.swing.JTextPane();
         panelError = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        cajonMostrarErroers = new javax.swing.JTextPane();
+        cajonErroresLexicos = new javax.swing.JTextPane();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        cajonErroresSinstacticos = new javax.swing.JTextPane();
         jLabel1 = new javax.swing.JLabel();
         botonAnalizar = new javax.swing.JButton();
         botonLimpiar = new javax.swing.JButton();
@@ -99,19 +102,23 @@ public class VistaGeneral extends javax.swing.JFrame {
         panelContenedorEditor.add(panelTexto);
         panelTexto.setBounds(40, 0, 850, 300);
 
-        cajonMostrarErroers.setBackground(new java.awt.Color(153, 153, 153));
-        jScrollPane3.setViewportView(cajonMostrarErroers);
+        panelError.setBackground(new java.awt.Color(153, 153, 153));
+        panelError.setLayout(null);
 
-        javax.swing.GroupLayout panelErrorLayout = new javax.swing.GroupLayout(panelError);
-        panelError.setLayout(panelErrorLayout);
-        panelErrorLayout.setHorizontalGroup(
-            panelErrorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 880, Short.MAX_VALUE)
-        );
-        panelErrorLayout.setVerticalGroup(
-            panelErrorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
-        );
+        cajonErroresLexicos.setBackground(new java.awt.Color(153, 153, 153));
+        cajonErroresLexicos.setBorder(null);
+        cajonErroresLexicos.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jScrollPane3.setViewportView(cajonErroresLexicos);
+
+        panelError.add(jScrollPane3);
+        jScrollPane3.setBounds(0, 0, 450, 170);
+
+        cajonErroresSinstacticos.setBackground(new java.awt.Color(153, 153, 153));
+        cajonErroresSinstacticos.setBorder(null);
+        jScrollPane4.setViewportView(cajonErroresSinstacticos);
+
+        panelError.add(jScrollPane4);
+        jScrollPane4.setBounds(454, 0, 430, 170);
 
         panelContenedorEditor.add(panelError);
         panelError.setBounds(10, 350, 880, 170);
@@ -211,7 +218,7 @@ public class VistaGeneral extends javax.swing.JFrame {
         panelOpciones.add(botonAyuda, new java.awt.GridBagConstraints());
 
         panelGeneral.add(panelOpciones);
-        panelOpciones.setBounds(40, 10, 560, 30);
+        panelOpciones.setBounds(130, 10, 550, 30);
 
         getContentPane().add(panelGeneral);
         panelGeneral.setBounds(0, 0, 880, 660);
@@ -253,16 +260,22 @@ public class VistaGeneral extends javax.swing.JFrame {
                 controlAnalizador.analizar();
                 this.listTokens = controlAnalizador.getListTokens();            //Obtener la lista de Tokens
                     ventanaReportes = new VentanaReportes(listTokens);  //Pasando la informacion a la clase que creara los reportes
+                    
                     Analizador_Sintactico aSintactico = new Analizador_Sintactico();
                     aSintactico.setListTokens(listTokens);
-//                    aSintactico.identificarExpresion();
                     aSintactico.identificarInstruccion();
+//                    aSintactico.identificarExpresion();
 //                    aSintactico.identificar_Operadores_Entrada_salida();
-                    ventanaReportes.setListExpresiones(aSintactico.getListExpresiones());
+//instrucciones por bloque de Codigo
+                    
+                    
+                    PanelListaPorBloque_de_Codigo paneListaPorBloque = new PanelListaPorBloque_de_Codigo(aSintactico.getBloques());
+                    ventanaReportes.setPanelInstruccionesPor_bloque_Codigo(paneListaPorBloque);
+                    
+                    ventanaReportes.setListExpresiones(aSintactico.getListSimbolos());
+                    ventanaReportes.setListErroresInstrucciones(aSintactico.getErrores());
+                    
                     ventanaReportes.verReportes();
-                    
-
-                    
                     
                     
               CrearArchivoDot crearArchivoDot = new CrearArchivoDot(listTokens);  //Mandando la lista de tokens para crear los Archivos Dot
@@ -274,9 +287,10 @@ public class VistaGeneral extends javax.swing.JFrame {
                     }
                 } catch (Exception e) {
                 }
-                MostraErrores mostrarErr;                                               //Mostrar errores en el Cajon de errores        
-                mostrarErr = new MostraErrores(controlAnalizador.getListTokens(), this);
-                mostrarErr.clasificarerrores();
+                
+                MostraErrores configurarErrorcajon;                                               //Mostrar errores en el Cajon de errores        
+                configurarErrorcajon = new MostraErrores(controlAnalizador.getListTokens(), aSintactico.getErrores(),this);
+                configurarErrorcajon.clasificarerrores();
             }else{
                 JOptionPane.showMessageDialog(panelGeneral, "Editor Vacio, no puede Analizar");
             }
@@ -284,7 +298,7 @@ public class VistaGeneral extends javax.swing.JFrame {
 
     private void botonLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonLimpiarActionPerformed
         cajonEditorTexto.setText("");                                       //Limpiar el cajon de texto
-        cajonMostrarErroers.setText("");
+        cajonErroresLexicos.setText("");
         panelContenedorGraficos.setVisible(false);
         panelContenedorEditor.setVisible(true);
     }//GEN-LAST:event_botonLimpiarActionPerformed
@@ -346,11 +360,11 @@ public class VistaGeneral extends javax.swing.JFrame {
     }//GEN-LAST:event_botonReportesActionPerformed
 
     public JTextPane getcajonMostrarErroers() {
-        return cajonMostrarErroers;
+        return cajonErroresLexicos;
     }
 
-    public void setCajonMostrarErroes(String areaErrores) {
-        this.cajonMostrarErroers.setText(areaErrores);
+    public void setCajonErroresLexicos(String texto) {
+        this.cajonErroresLexicos.setText(texto);
     }
       public JTextPane getCajonTexto() {
         return cajonEditorTexto;
@@ -360,6 +374,11 @@ public class VistaGeneral extends javax.swing.JFrame {
     public void setCajonTexto(String cajonTexto) {
         this.cajonEditorTexto.setText(cajonTexto);
     }
+    
+    public void setCajonErroresSintacticos(String texto){
+        this.cajonErroresSinstacticos.setText(texto);
+    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton archivo;
@@ -370,13 +389,15 @@ public class VistaGeneral extends javax.swing.JFrame {
     private javax.swing.JButton botonLimpiar;
     private javax.swing.JButton botonReportes;
     private javax.swing.JTextPane cajonEditorTexto;
-    private javax.swing.JTextPane cajonMostrarErroers;
+    private javax.swing.JTextPane cajonErroresLexicos;
+    private javax.swing.JTextPane cajonErroresSinstacticos;
     private javax.swing.JButton editorTexto;
     private javax.swing.JButton generarGraficos;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JPanel panelContenedorEditor;
     private javax.swing.JPanel panelContenedorGraficos;
     private javax.swing.JPanel panelContenedorGraficos_Editor;

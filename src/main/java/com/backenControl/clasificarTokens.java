@@ -19,7 +19,7 @@ import javax.swing.JPanel;
  * @author Jonwil
  */
 
-public class clasificarTokens implements ActionListener{
+    public class clasificarTokens implements ActionListener{
     
     private List<Token> listTokens;
 
@@ -105,7 +105,6 @@ public class clasificarTokens implements ActionListener{
             
         }
 
-        
 
 //        panelContenedorImagen.add(new JLabel(lexema));
         panelGraficos.updateUI();
@@ -116,15 +115,5 @@ public class clasificarTokens implements ActionListener{
         
     }
     
-    
-//    public void concatenar(String Lexema){
-//        char [] caracteres = Lexema.toCharArray();
-//        
-//        
-//        
-//        
-//    }
-        
-        
     
 }
